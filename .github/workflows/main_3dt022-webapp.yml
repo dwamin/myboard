@@ -56,6 +56,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-app
+          path: .
       
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
@@ -63,4 +64,5 @@ jobs:
         with:
           app-name: '3dt022-webapp'
           slot-name: 'Production'
+
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_188E7B3AE0C9464E92B72503D97AC71F }}
