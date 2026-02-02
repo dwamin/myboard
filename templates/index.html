@@ -1,0 +1,155 @@
+{% extends 'base.html' %} {% block title %}게시판 - 목록{% endblock %} {% block
+content %}
+<style>
+    /* 표를 예쁘게 만드는 스타일 */
+    .fms-container {
+        margin: 50px auto;
+        padding: 20px;
+        max-width: 1200px;
+        font-family: 'Malgun Gothic', sans-serif;
+    }
+    .fms-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        border-left: 5px solid #3498db;
+        padding-left: 15px;
+    }
+    .search-box {
+        margin-bottom: 15px;
+        padding: 10px;
+        width: 100%;
+        max-width: 300px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+    .fms-table {
+        width: 100%;
+        border-collapse: collapse;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        font-size: 18px; /* 글자 크기를 키웠어요 */
+    }
+    .fms-table th {
+        background-color: #3498db;
+        color: white;
+        padding: 15px; /* 간격을 넉넉히 줬어요 */
+    }
+    .fms-table td {
+        padding: 15px;
+        border-bottom: 1px solid #ddd;
+    }
+    .fms-table tr:hover {
+        background-color: #f1f1f1; /* 마우스 올리면 색이 변해요 */
+        transition: 0.3s;
+    }
+</style>
+
+<div class="fms-container">
+    <div class="fms-title">🐥 양계장 관리 시스템 실시간 현황</div>
+    
+    <input type="text" id="searchInput" class="search-box" placeholder="병아리 번호나 품종 검색...">
+
+    <table class="fms-table" id="chickTable">
+        <thead>
+            <tr>
+                <th>병아리 번호</th>
+                <th>품종 (Breeds)</th>
+                <th>성별</th>
+                <th>부화일</th>
+                <th>달걀 무게</th>
+                <th>농장 위치</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if chicks %}
+                {% for chick in chicks %}
+                <tr>
+                    <td><strong>{{ chick.chick_no }}</strong></td>
+                    <td>{{ chick.breeds }}</td>
+                    <td>{{ chick.gender }}</td>
+                    <td>{{ chick.hatchday }}</td>
+                    <td><span style="color: #e67e22; font-weight: bold;">{{ chick.egg_weight }}g</span></td>
+                    <td>{{ chick.farm }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="6">데이터가 없습니다.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#chickTable tbody tr');
+
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+</script>
+<div class="bg-white shadow-lg rounded-lg p-6">
+  <h2 class="text-2xl font-bold mb-6">게시글 목록</h2>
+
+  <div class="mb-4 flex justify-end">
+    <a
+      href="{{ url_for('create_form') }}"
+      class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+    >
+      <i class="fas fa-pen mr-2"></i>새 글 작성
+    </a>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full bg-white">
+      <thead>
+        <tr class="bg-gray-100 text-gray-600 uppercase text-sm">
+          <th class="py-3 px-6 text-left">번호</th>
+          <th class="py-3 px-6 text-left">제목</th>
+          <th class="py-3 px-6 text-left">작성자</th>
+          <th class="py-3 px-6 text-left">작성일</th>
+          <th class="py-3 px-6 text-center">조회수</th>
+          <th class="py-3 px-6 text-center">좋아요</th>
+        </tr>
+      </thead>
+      <tbody class="text-gray-600">
+        {% for post in posts %}
+        <tr class="border-b border-gray-200 hover:bg-gray-50">
+          <td class="py-3 px-6">{{ post['id'] }}</td>
+          <td class="py-3 px-6">
+            <a
+              href="{{ url_for('view_post', post_id=post.id) }}"
+              class="text-indigo-600 hover:text-indigo-800"
+            >
+              {{ post['title'] }}
+            </a>
+          </td>
+          <td class="py-3 px-6">{{ post['author'] }}</td>
+          <td class="py-3 px-6">
+            {{ post['created_at'].strftime('%Y-%m-%d %H:%M') }}
+          </td>
+          <td class="py-3 px-6 text-center">{{ post['view_count'] }}</td>
+          <td class="py-3 px-6 text-center">
+            <span class="text-red-500">
+              <i class="fas fa-heart mr-1"></i>{{ post['like_count'] }}
+            </span>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" class="py-6 text-center text-gray-500">
+            게시글이 없습니다.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
